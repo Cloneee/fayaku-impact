@@ -1,0 +1,20 @@
+{
+  "name": "fayaku-impact",
+  "version": "1.0.0",
+  "description": "Discord chatbot for genshin impact",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Clone",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "discord.js": "^13.6.0",
+    "dotenv": "^14.2.0"
+  }
+}
