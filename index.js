@@ -8,6 +8,7 @@ const {
 } = require("discord.js");
 const axios = require("axios");
 const API = "https://api.genshin.dev/";
+require("dotenv/config");
 
 const callAPI = async (str = "") => {
   let respone = await axios.get(API + str);
@@ -17,7 +18,6 @@ const callAPI = async (str = "") => {
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
-require("dotenv/config");
 
 const button = new MessageActionRow().addComponents(
   new MessageButton().setLabel("Exit").setCustomId("exit").setStyle("DANGER")
@@ -64,10 +64,12 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isSelectMenu()) return;
-  let data, id,
+  let data,
+    id,
     select = [];
-  isNaN(interaction.customId[interaction.customId.length-1]) ? id = interaction.customId : id = interaction.customId.slice(0,-1)
-  console.log(id)
+  isNaN(interaction.customId[interaction.customId.length - 1])
+    ? (id = interaction.customId)
+    : (id = interaction.customId.slice(0, -1));
   switch (id) {
     // First select
     case "select":
@@ -100,42 +102,53 @@ client.on("interactionCreate", async (interaction) => {
       });
       break;
     case "characters":
-      data = await callAPI(
-        "characters/" + interaction.values[0]
-      );
-      let characterID = interaction.values[0].replace("-","_")
-      console.log(characterID)
+      let characterID = interaction.values[0];
+      data = await callAPI("characters/" + characterID);
       const exampleEmbed = new MessageEmbed()
         .setColor("#0099ff")
-        .setTitle(
-          interaction.values[0][0].toUpperCase() +
-            interaction.values[0].slice(1) +
-            " Infomation"
-        )
-        .setURL("https://discord.js.org/")
+        .setTitle(data.name + " Infomation")
+        .setURL("https://www.facebook.com/groups/fayaku")
         .setAuthor({
           name: "Fayaku Impact",
           iconURL: `https://img.captain-droid.com/wp-content/uploads/com-mihoyo-genshinimpact-icon.png`,
           url: "https://www.facebook.com/groups/fayaku",
         })
-        .setDescription("Some description here")
-        .setThumbnail(`https://genshin.honeyhunterworld.com/img/char/${characterID}.png`)
+        .setDescription(data.description)
+        .setThumbnail(`${API}characters/${characterID}/icon`)
         .addFields(
-          { name: "Regular field title", value: "Some value here" },
+          { name: "Vision", value: data.vision, inline: true },
+          { name: "Weapon", value: data.weapon, inline: true },
+          { name: "Nation", value: data.nation, inline: true },
           { name: "\u200B", value: "\u200B" },
           {
-            name: "Inline field title",
-            value: "Some value here",
+            name: "Elemental Skill",
+            value: data.skillTalents[1].name,
             inline: true,
           },
-          { name: "Inline field title", value: "Some value here", inline: true }
+          {
+            name: "Elemental Burst",
+            value: data.skillTalents[2].name,
+            inline: true,
+          },
+          {
+            name: "Passive 1",
+            value: data.passiveTalents[0].name,
+            inline: true,
+          },
+          {
+            name: "Passive 2",
+            value: data.skillTalents[1].name,
+            inline: true,
+          }
         )
-        .addField("Inline field title", "Some value here", true)
-        .setImage(`https://genshin.honeyhunterworld.com/img/char/${characterID}_gacha_splash.png`)
+        .setImage(
+          `${API}characters/${characterID}/gacha-splash`
+        )
         .setTimestamp()
         .setFooter({
           text: "Fayaku Impact",
-          iconURL: "https://img.captain-droid.com/wp-content/uploads/com-mihoyo-genshinimpact-icon.png",
+          iconURL:
+            "https://img.captain-droid.com/wp-content/uploads/com-mihoyo-genshinimpact-icon.png",
         });
 
       await interaction.update({
@@ -149,7 +162,7 @@ client.on("interactionCreate", async (interaction) => {
         content: "New feture not dev yet",
         components: [],
       });
-      break
+      break;
   }
 });
 
